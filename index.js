@@ -1,10 +1,15 @@
-import dgram from 'dgram';
-import { Buffer } from 'buffer';
+var PORT = 6024;
+var dgram = require('dgram');
+var client = dgram.createSocket('udp4');
 
-const message = Buffer.from('Some bytes');
-const client = dgram.createSocket('udp4');
-client.connect(41234, 'localhost', (err) => {
-  client.send(message, (err) => {
-    client.close();
-  });
+client.on('listening', function () {
+    var address = client.address();
+    console.log('UDP Client listening on ' + address.address + ":" + address.port);
+    client.setBroadcast(true);
 });
+
+client.on('message', function (message, rinfo) {
+    console.log('Message from: ' + rinfo.address + ':' + rinfo.port +' - ' + message);
+});
+
+client.bind(PORT);
